@@ -6,7 +6,7 @@ import logging
 import argparse
 import glob
 
-# Configure logging
+# Setting up logging to help us keep track of what's happening in the script
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -16,6 +16,7 @@ def extract_data(file_path):
     """
     logger.info(f"Extracting data from {file_path}...")
     try:
+        # Load data from CSV file into a DataFrame
         df = pd.read_csv(file_path)
         logger.info(f"Successfully extracted {len(df)} rows of data from {file_path}")
         return df
@@ -30,30 +31,36 @@ def transform_data(df):
     logger.info("Transforming data...")
     
     try:
-        # Convert 'Date' to datetime
+        # Convert 'Date' to datetime for easier manipulation later on
+        logger.debug("Converting 'Date' column to datetime...")
         df['Date'] = pd.to_datetime(df['Date'])
         
-        # Ensure all required columns are present
+        # Making sure all the columns we need are actually in the data
         required_columns = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Ticker']
         for col in required_columns:
             if col not in df.columns:
+                logger.error(f"Required column '{col}' not found in the data")
                 raise ValueError(f"Required column '{col}' not found in the data")
 
-        # Calculate daily returns if not already present
+        # Calculate daily return percentage for each stock; helps track day-to-day changes
         if 'Daily_Return' not in df.columns:
+            logger.debug("Calculating daily returns for each stock...")
             df['Daily_Return'] = df.groupby('Ticker')['Close'].pct_change()
 
-        # Calculate 7-day moving average if not already present
+        # Calculate a 7-day moving average for the closing price, useful for seeing short-term trends
         if 'MA7' not in df.columns:
+            logger.debug("Calculating 7-day moving average for each stock...")
             df['MA7'] = df.groupby('Ticker')['Close'].rolling(window=7).mean().reset_index(0, drop=True)
 
-        # Calculate 30-day moving average
+        # Calculate a 30-day moving average, gives a sense of longer-term trends
+        logger.debug("Calculating 30-day moving average for each stock...")
         df['MA30'] = df.groupby('Ticker')['Close'].rolling(window=30).mean().reset_index(0, drop=True)
 
-        # Calculate volatility (20-day rolling standard deviation of returns)
+        # Calculate 20-day rolling volatility based on daily returns; a good measure of risk
+        logger.debug("Calculating 20-day rolling volatility for each stock...")
         df['Volatility'] = df.groupby('Ticker')['Daily_Return'].rolling(window=20).std().reset_index(0, drop=True)
 
-        # Drop rows with NaN values
+        # Drop rows with any NaN values that result from rolling calculations
         original_len = len(df)
         df = df.dropna()
         logger.info(f"Dropped {original_len - len(df)} rows with NaN values")
@@ -71,13 +78,16 @@ def load_data(df, db_path):
     
     try:
         with sqlite3.connect(db_path) as conn:
+            # Create the table if it doesn't exist yet
+            logger.debug("Creating table 'stock_data' if it does not exist...")
             conn.execute('''
             CREATE TABLE IF NOT EXISTS stock_data
-            (Date TEXT, Ticker TEXT, Open REAL, High REAL, Low REAL, Close REAL, Volume INTEGER, 
+            (Date TEXT, Ticker TEXT, Open REAL, High REAL, Low REAL, Close REAL, Volume INTEGER,
             Daily_Return REAL, MA7 REAL, MA30 REAL, Volatility REAL,
             PRIMARY KEY (Date, Ticker))
             ''')
-            # Insert data using a transaction
+            # Insert the data into the table, replacing it if it already exists
+            logger.debug("Inserting data into 'stock_data' table...")
             df.to_sql('stock_data', conn, if_exists='replace', index=False)
         
         logger.info(f"Successfully loaded {len(df)} rows of data")
@@ -92,7 +102,9 @@ def etl_process(input_dir, db_file):
     logger.info("Starting ETL process...")
     
     all_data = []
+    # Find all CSV files that match the pattern in the input directory
     csv_files = glob.glob(os.path.join(input_dir, '*_stock_data.csv'))
+    logger.debug(f"Found {len(csv_files)} CSV files in {input_dir}")
     
     if not csv_files:
         logger.error(f"No CSV files found in {input_dir}. Please run the scraper first.")
@@ -100,21 +112,23 @@ def etl_process(input_dir, db_file):
 
     for csv_file in csv_files:
         try:
-            # Extract
+            logger.debug(f"Processing file: {csv_file}")
+            # Extract the data from the CSV file
             df = extract_data(csv_file)
             
-            # Transform
+            # Transform the data to prepare it for analysis
             df = transform_data(df)
             
+            # Add the DataFrame to the list of all data
             all_data.append(df)
         except Exception as e:
             logger.error(f"Error processing {csv_file}: {e}")
 
     if all_data:
-        # Combine all dataframes
+        # Combine all individual DataFrames into one large DataFrame
         combined_df = pd.concat(all_data, ignore_index=True)
         
-        # Load
+        # Load the combined data into the SQLite database
         load_data(combined_df, db_file)
         
         logger.info("ETL process completed successfully!")
@@ -122,17 +136,20 @@ def etl_process(input_dir, db_file):
         logger.error("No data to load. ETL process failed.")
 
 def parse_arguments():
+    # Parse command-line arguments to specify input directory and output database file
     parser = argparse.ArgumentParser(description="ETL pipeline for stock data")
-    parser.add_argument("--input_dir", default=os.path.join(os.path.dirname(__file__), '..', 'data'), 
+    parser.add_argument("--input_dir", default=os.path.join(os.path.dirname(__file__), '..', 'data'),
                         help="Directory containing the input CSV files")
-    parser.add_argument("--db_file", default=os.path.join(os.path.dirname(__file__), '..', 'data', 'stock_data.db'), 
+    parser.add_argument("--db_file", default=os.path.join(os.path.dirname(__file__), '..', 'data', 'stock_data.db'),
                         help="Path to the output SQLite database file")
     return parser.parse_args()
 
 if __name__ == "__main__":
+    # Parse command-line arguments to get input directory and database file path
     args = parse_arguments()
     
-    # Ensure the output directory exists
+    # Make sure the directory for the database file exists
     os.makedirs(os.path.dirname(args.db_file), exist_ok=True)
     
+    # Execute the ETL process
     etl_process(args.input_dir, args.db_file)
