@@ -39,3 +39,4 @@ python-dotenv==1.0.0
 
 # Miscellaneous Utilities
 tqdm==4.66.1  # for progress bars
+yfinance
