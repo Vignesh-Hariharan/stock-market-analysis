@@ -1,6 +1,6 @@
 # 🚀 StockSense: Real-Time Market Analysis & Prediction Platform
 
-![StockSense Banner](https://via.placeholder.com/800x200?text=StockSense:+AI-Powered+Stock+Market+Insights)
+![StockSense Banner](placeholder)
 
 ## 🌟 Project Overview
 
