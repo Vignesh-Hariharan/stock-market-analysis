@@ -1,6 +1,6 @@
 # 🚀 StockSense: Real-Time Market Analysis & Prediction Platform
 
-![StockSense Banner](placeholder)
+![StockSense Banner](https://raw.githubusercontent.com/Vignesh-Hariharan/stocksense/main/images/stocksense_banner.png)
 
 ## 🌟 Project Overview
 
@@ -76,39 +76,36 @@ stock_market_analysis/
 
 StockSense uses a Long Short-Term Memory (LSTM) neural network to predict future stock prices based on historical trends. The model is implemented using TensorFlow and trained on scaled historical price data.
 
+![LSTM Model Architecture](https://raw.githubusercontent.com/Vignesh-Hariharan/stocksense/main/images/lstm_architecture.png)
+
 ## 📈 Outputs and Visualizations
 
 StockSense generates a variety of outputs to provide comprehensive insights:
 
-1. **Candlestick Charts**: Interactive HTML charts for AAPL, MSFT, and GOOGL stocks.
-   - `AAPL_candlestick.html`, `MSFT_candlestick.html`, `GOOGL_candlestick.html`
+### 1. Candlestick Charts
+Interactive HTML charts for AAPL, MSFT, and GOOGL stocks.
 
-2. **Advanced Technical Indicator Plots**: HTML-based interactive charts with various technical indicators.
-   - `AAPL_advanced_technical.html`, `MSFT_advanced_technical.html`, `GOOGL_advanced_technical.html`
+![Sample Candlestick Chart](https://raw.githubusercontent.com/Vignesh-Hariharan/stocksense/main/images/sample_candlestick.png)
 
-3. **Summary Statistics**: CSV files containing key statistical measures for each stock.
-   - `AAPL_summary_statistics.csv`, `MSFT_summary_statistics.csv`, `GOOGL_summary_statistics.csv`
+### 2. Advanced Technical Indicator Plots
+HTML-based interactive charts with various technical indicators.
 
-4. **Seasonal Decomposition**: PNG images showing trend, seasonal, and residual components of each stock's time series.
-   - `AAPL_seasonal_decomposition.png`, `MSFT_seasonal_decomposition.png`, `GOOGL_seasonal_decomposition.png`
+![Sample Technical Indicators](https://raw.githubusercontent.com/Vignesh-Hariharan/stocksense/main/images/sample_technical_indicators.png)
 
-5. **Correlation Heatmap**: A PNG image visualizing the correlation between different stocks.
-   - `correlation_heatmap.png`
+### 3. Summary Statistics
+CSV files containing key statistical measures for each stock.
+
+### 4. Seasonal Decomposition
+PNG images showing trend, seasonal, and residual components of each stock's time series.
+
+![Sample Seasonal Decomposition](https://raw.githubusercontent.com/Vignesh-Hariharan/stocksense/main/images/sample_seasonal_decomposition.png)
+
+### 5. Correlation Heatmap
+A PNG image visualizing the correlation between different stocks.
+
+![Correlation Heatmap](https://raw.githubusercontent.com/Vignesh-Hariharan/stocksense/main/output/correlation_heatmap.png)
 
 All these outputs can be found in the `output/` directory of the project.
 
-## 🤝 Contributing
-
-We welcome contributions to StockSense! Please check out our [Contribution Guidelines](CONTRIBUTING.md) to get started.
-
-## 📄 License
-
-StockSense is released under the [MIT License](LICENSE).
-
-## 📞 Support
-
-Encountering issues or have questions? Open an issue on GitHub or contact our support team at support@stocksense.ai.
-
----
 
 <p align="center">Made with ❤️ by the StockSense Team</p>
