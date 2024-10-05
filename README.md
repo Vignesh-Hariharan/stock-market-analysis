@@ -103,7 +103,7 @@ StockSense uses a Long Short-Term Memory (LSTM) neural network to predict future
 
 ## 📈 Sample Visualization
 
-![Sample Dashboard](https://via.placeholder.com/600x400?text=StockSense+Interactive+Dashboard)
+![Sample Dashboard](image)
 
 ## 🤝 Contributing
 
