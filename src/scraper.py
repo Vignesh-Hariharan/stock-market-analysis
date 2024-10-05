@@ -6,10 +6,20 @@ import argparse
 from datetime import datetime, timedelta
 import numpy as np
 import time
+from tqdm import tqdm
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+def validate_data_structure(df):
+    """
+    Validate that the dataframe has all the required columns.
+    """
+    required_columns = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume', 'Ticker']
+    missing_columns = [col for col in required_columns if col not in df.columns]
+    if missing_columns:
+        raise ValueError(f"Missing required columns: {', '.join(missing_columns)}")
 
 def fetch_stock_data(ticker, start_date, end_date, retries=3):
     """
@@ -26,6 +36,13 @@ def fetch_stock_data(ticker, start_date, end_date, retries=3):
 
             stock_data.reset_index(inplace=True)
             stock_data['Ticker'] = ticker  # Add ticker column for identification
+            
+            try:
+                validate_data_structure(stock_data)
+            except ValueError as e:
+                logger.error(f"Data validation failed for {ticker}: {e}")
+                return None
+            
             logger.info(f"Successfully fetched {len(stock_data)} rows of data for {ticker}.")
             return stock_data
         except Exception as e:
@@ -38,7 +55,7 @@ def fetch_stock_data(ticker, start_date, end_date, retries=3):
 
 def calculate_technical_indicators(df):
     """
-    Calculate additional technical indicators
+    Calculate additional technical indicators and handle NaN values
     """
     df['Daily_Return'] = df['Close'].pct_change()
     df['MA7'] = df['Close'].rolling(window=7).mean()
@@ -53,6 +70,10 @@ def calculate_technical_indicators(df):
     df['BB_middle'] = df['Close'].rolling(window=20).mean()
     df['BB_upper'] = df['BB_middle'] + 2 * df['Close'].rolling(window=20).std()
     df['BB_lower'] = df['BB_middle'] - 2 * df['Close'].rolling(window=20).std()
+
+    # Handle NaN values
+    df.fillna(method='ffill', inplace=True)  # Forward fill missing values
+    df.fillna(method='bfill', inplace=True)  # Backward fill if necessary
 
     return df
 
@@ -74,7 +95,7 @@ def scraper(tickers, start_date, end_date, output_dir):
     os.makedirs(output_dir, exist_ok=True)
     all_stocks_data = []
 
-    for ticker in tickers:
+    for ticker in tqdm(tickers, desc="Scraping stocks"):
         try:
             stock_data = fetch_stock_data(ticker, start_date, end_date)
             if stock_data is not None:
@@ -91,6 +112,8 @@ def scraper(tickers, start_date, end_date, output_dir):
         combined_file_path = os.path.join(output_dir, f'all_stocks_data_{datetime.now().strftime("%Y%m%d_%H%M")}.csv')
         save_to_csv(combined_data, combined_file_path)
         logger.info(f"Combined data saved to {combined_file_path}")
+    else:
+        logger.warning("No stock data fetched. Please check your tickers and retry.")
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Fetch historical stock data")
@@ -102,12 +125,14 @@ def parse_arguments():
 
 def validate_dates(start_date, end_date):
     """
-    Validate that the start date is before the end date
+    Validate that the start date is before the end date and the range doesn't exceed 5 years
     """
     start = datetime.strptime(start_date, '%Y-%m-%d')
     end = datetime.strptime(end_date, '%Y-%m-%d')
     if start >= end:
         raise ValueError("Start date must be before end date")
+    if (end - start).days > 365 * 5:
+        raise ValueError("Date range cannot exceed 5 years")
 
 if __name__ == "__main__":
     args = parse_arguments()
@@ -124,4 +149,3 @@ if __name__ == "__main__":
 
     scraper(args.tickers, args.start_date, args.end_date, args.output_dir)
     logger.info("Scraping process completed.")
-
