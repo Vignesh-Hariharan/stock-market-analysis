@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 import numpy as np
 import time
 from tqdm import tqdm
+import requests
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -21,9 +22,9 @@ def validate_data_structure(df):
     if missing_columns:
         raise ValueError(f"Missing required columns: {', '.join(missing_columns)}")
 
-def fetch_stock_data(ticker, start_date, end_date, retries=3):
+def fetch_stock_data(ticker, start_date, end_date, retries=3, backoff_factor=2):
     """
-    Fetch historical stock data for a specific ticker from Yahoo Finance, with retry logic.
+    Fetch historical stock data for a specific ticker from Yahoo Finance, with retry logic and exponential backoff.
     """
     for attempt in range(retries):
         try:
@@ -37,18 +38,26 @@ def fetch_stock_data(ticker, start_date, end_date, retries=3):
             stock_data.reset_index(inplace=True)
             stock_data['Ticker'] = ticker  # Add ticker column for identification
             
-            try:
-                validate_data_structure(stock_data)
-            except ValueError as e:
-                logger.error(f"Data validation failed for {ticker}: {e}")
-                return None
+            validate_data_structure(stock_data)
             
             logger.info(f"Successfully fetched {len(stock_data)} rows of data for {ticker}.")
             return stock_data
+        except requests.exceptions.RequestException as e:
+            if "429" in str(e):  # Rate limit error
+                wait_time = backoff_factor ** attempt
+                logger.warning(f"Rate limit hit. Waiting for {wait_time} seconds before retrying.")
+                time.sleep(wait_time)
+            else:
+                logger.error(f"Error fetching data for {ticker}: {e}")
+                if attempt < retries - 1:
+                    time.sleep(2)  # Wait for a few seconds before retrying
+                else:
+                    logger.error(f"Failed to fetch data for {ticker} after {retries} attempts.")
+                    return None
         except Exception as e:
-            logger.error(f"Error fetching data for {ticker}: {e}")
+            logger.error(f"Unexpected error fetching data for {ticker}: {e}")
             if attempt < retries - 1:
-                time.sleep(2)  # Wait for a few seconds before retrying
+                time.sleep(2)
             else:
                 logger.error(f"Failed to fetch data for {ticker} after {retries} attempts.")
                 return None
@@ -94,26 +103,31 @@ def scraper(tickers, start_date, end_date, output_dir):
     """
     os.makedirs(output_dir, exist_ok=True)
     all_stocks_data = []
+    
+    # Check for existing progress
+    processed_tickers = set(filename.split('_')[0] for filename in os.listdir(output_dir) if filename.endswith('_stock_data.csv'))
+    tickers_to_process = [ticker for ticker in tickers if ticker not in processed_tickers]
 
-    for ticker in tqdm(tickers, desc="Scraping stocks"):
-        try:
-            stock_data = fetch_stock_data(ticker, start_date, end_date)
-            if stock_data is not None:
-                stock_data = calculate_technical_indicators(stock_data)
-                file_path = os.path.join(output_dir, f'{ticker}_stock_data.csv')
-                save_to_csv(stock_data, file_path)
-                all_stocks_data.append(stock_data)
-            time.sleep(1)  # Add a 1-second delay between API calls
-        except Exception as e:
-            logger.error(f"Skipping {ticker} due to an error: {e}")
+    with tqdm(total=len(tickers), initial=len(processed_tickers), desc="Scraping stocks") as pbar:
+        for ticker in tickers_to_process:
+            try:
+                stock_data = fetch_stock_data(ticker, start_date, end_date)
+                if stock_data is not None:
+                    stock_data = calculate_technical_indicators(stock_data)
+                    file_path = os.path.join(output_dir, f'{ticker}_stock_data.csv')
+                    save_to_csv(stock_data, file_path)
+                    all_stocks_data.append(stock_data)
+                time.sleep(1)  # Add a 1-second delay between API calls
+            except Exception as e:
+                logger.error(f"Skipping {ticker} due to an error: {e}")
+            finally:
+                pbar.update(1)
 
     if all_stocks_data:
         combined_data = pd.concat(all_stocks_data, ignore_index=True)
         combined_file_path = os.path.join(output_dir, f'all_stocks_data_{datetime.now().strftime("%Y%m%d_%H%M")}.csv')
         save_to_csv(combined_data, combined_file_path)
         logger.info(f"Combined data saved to {combined_file_path}")
-    else:
-        logger.warning("No stock data fetched. Please check your tickers and retry.")
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Fetch historical stock data")
