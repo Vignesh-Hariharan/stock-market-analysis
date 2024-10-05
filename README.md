@@ -131,4 +131,4 @@ All these outputs can be found in the `output/` directory of the project.
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-<p align="center">Made with ❤️ by the StockSense Team</p>
+<p align="center">Made by Vignesh</p>
