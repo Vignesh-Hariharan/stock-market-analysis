@@ -1,1 +1,41 @@
 
+# Web Scraping
+selenium==4.12.0
+beautifulsoup4==4.12.2
+requests==2.31.0
+
+# Data Manipulation and Analysis
+pandas==2.1.0
+numpy==1.25.2
+
+# Machine Learning
+scikit-learn==1.3.0
+tensorflow==2.13.0
+
+# Data Visualization
+matplotlib==3.7.2
+plotly==5.16.1
+
+# Database and ORM
+sqlalchemy==2.0.20
+snowflake-sqlalchemy==1.5.0
+redshift-connector==2.0.915
+
+# Jupyter (optional, for development and data exploration)
+jupyter==1.0.0
+
+# API Development (if you plan to create an API)
+flask==2.3.3
+
+# Testing
+pytest==7.4.0
+
+# Code Formatting and Linting
+black==23.7.0
+flake8==6.1.0
+
+# Environment Management
+python-dotenv==1.0.0
+
+# Miscellaneous Utilities
+tqdm==4.66.1  # for progress bars
