@@ -12,7 +12,7 @@ StockSense is a cutting-edge platform that leverages real-time data and artifici
 - **Robust ETL Pipeline**: Efficiently process and load data into a scalable cloud data warehouse
 - **Intelligent Storage**: Leverage the power of Snowflake or Redshift for efficient data management
 - **Predictive Analytics**: Utilize LSTM neural networks to forecast market trends
-- **Interactive Visualizations**: Gain deep insights through stunning, interactive data representations in Tableau or Power BI
+- **Interactive Visualizations**: Gain deep insights through stunning, interactive data representations
 
 ## 🛠 Technology Stack
 
@@ -28,7 +28,8 @@ StockSense harnesses a powerful combination of technologies:
   - ❄ **Snowflake** or 🚀 **Redshift**: Scalable, cloud-native storage solutions
 
 - **Visualization**:
-  - 📊 **Tableau** or 📈 **Power BI**: Create stunning, interactive dashboards
+  - 📊 **Plotly**: Create interactive HTML-based charts
+  - 📈 **Matplotlib**: Generate static visualizations
 
 ## 📂 Project Structure
 
@@ -40,6 +41,20 @@ stock_market_analysis/
 │   ├── etl_pipeline.py
 │   ├── model.py
 │   └── visualization.py
+├── output/
+│   ├── AAPL_candlestick.html
+│   ├── MSFT_candlestick.html
+│   ├── GOOGL_candlestick.html
+│   ├── AAPL_advanced_technical.html
+│   ├── MSFT_advanced_technical.html
+│   ├── GOOGL_advanced_technical.html
+│   ├── AAPL_summary_statistics.csv
+│   ├── MSFT_summary_statistics.csv
+│   ├── GOOGL_summary_statistics.csv
+│   ├── AAPL_seasonal_decomposition.png
+│   ├── MSFT_seasonal_decomposition.png
+│   ├── GOOGL_seasonal_decomposition.png
+│   └── correlation_heatmap.png
 ├── README.md
 ├── requirements.txt
 └── .gitignore
@@ -47,47 +62,7 @@ stock_market_analysis/
 
 ## 🚀 Setup Instructions
 
-Get StockSense up and running with these steps:
-
-1. **Clone the Repository**
-   ```
-   git clone https://github.com/yourusername/stocksense.git
-   cd stocksense
-   ```
-
-2. **Set Up Your Environment**
-   ```
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-   ```
-
-3. **Install Dependencies**
-   ```
-   pip install -r requirements.txt
-   ```
-
-4. **Configure Chrome WebDriver**
-   - Download the appropriate version of ChromeDriver
-   - Update the path in `src/scraper.py`
-
-5. **Set Up Your Data Warehouse**
-   - Create a Snowflake or Redshift account
-   - Update connection details in `src/etl_pipeline.py`
-
-6. **Launch the Data Pipeline**
-   ```
-   python src/scraper.py  # Initiate real-time data collection
-   python src/etl_pipeline.py  # Load data into your warehouse
-   ```
-
-7. **Train the AI Model**
-   ```
-   python src/model.py
-   ```
-
-8. **Visualize Your Insights**
-   - Connect Tableau or Power BI to your data warehouse
-   - Import the predictions.csv file for visualization
+(Setup instructions remain the same as in the original README)
 
 ## 📊 Data Flow
 
@@ -95,15 +70,32 @@ Get StockSense up and running with these steps:
 2. **Data Storage**: Scraped data is initially saved as CSV files in the `data/` directory.
 3. **ETL Process**: Data is extracted from CSV, transformed, and loaded into Snowflake/Redshift using SQLAlchemy.
 4. **Machine Learning**: Historical data is used to train an LSTM model for price predictions.
-5. **Visualization**: Actual and predicted stock prices are visualized using Tableau or Power BI.
+5. **Visualization**: Various visualizations are generated and saved in the `output/` directory.
 
 ## 🧠 Machine Learning Model
 
 StockSense uses a Long Short-Term Memory (LSTM) neural network to predict future stock prices based on historical trends. The model is implemented using TensorFlow and trained on scaled historical price data.
 
-## 📈 Sample Visualization
+## 📈 Outputs and Visualizations
 
-![Sample Dashboard](image)
+StockSense generates a variety of outputs to provide comprehensive insights:
+
+1. **Candlestick Charts**: Interactive HTML charts for AAPL, MSFT, and GOOGL stocks.
+   - `AAPL_candlestick.html`, `MSFT_candlestick.html`, `GOOGL_candlestick.html`
+
+2. **Advanced Technical Indicator Plots**: HTML-based interactive charts with various technical indicators.
+   - `AAPL_advanced_technical.html`, `MSFT_advanced_technical.html`, `GOOGL_advanced_technical.html`
+
+3. **Summary Statistics**: CSV files containing key statistical measures for each stock.
+   - `AAPL_summary_statistics.csv`, `MSFT_summary_statistics.csv`, `GOOGL_summary_statistics.csv`
+
+4. **Seasonal Decomposition**: PNG images showing trend, seasonal, and residual components of each stock's time series.
+   - `AAPL_seasonal_decomposition.png`, `MSFT_seasonal_decomposition.png`, `GOOGL_seasonal_decomposition.png`
+
+5. **Correlation Heatmap**: A PNG image visualizing the correlation between different stocks.
+   - `correlation_heatmap.png`
+
+All these outputs can be found in the `output/` directory of the project.
 
 ## 🤝 Contributing
 
