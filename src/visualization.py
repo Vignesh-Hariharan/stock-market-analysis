@@ -1,4 +1,3 @@
-
 import os
 import pandas as pd
 import numpy as np
@@ -8,9 +7,6 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import argparse
 import logging
-from datetime import datetime, timedelta
-from concurrent.futures import ProcessPoolExecutor, as_completed
-from sklearn.preprocessing import MinMaxScaler
 from statsmodels.tsa.seasonal import seasonal_decompose
 
 # Configure logging
@@ -25,6 +21,7 @@ def load_stock_data(file_path):
         df['Date'] = pd.to_datetime(df['Date'])
         df.set_index('Date', inplace=True)
         df.fillna(method='ffill', inplace=True)  # Fill missing data
+        df.fillna(method='bfill', inplace=True)  # Backward fill if necessary
         logger.info(f"Successfully loaded {len(df)} rows of data from {file_path}")
         return df
     except Exception as e:
@@ -102,6 +99,7 @@ def plot_advanced_technical_indicators(df, ticker, output_dir):
 def generate_summary_statistics(df, ticker, output_dir):
     """Generate and save summary statistics for the stock data."""
     try:
+        df = df.drop(columns=['Ticker'], errors='ignore')  # Exclude 'Ticker' column from stats
         summary = df.describe()
         summary.loc['skew'] = df.skew()
         summary.loc['kurtosis'] = df.kurtosis()
@@ -111,7 +109,6 @@ def generate_summary_statistics(df, ticker, output_dir):
         summary.loc['daily_return_mean'] = returns.mean()
         summary.loc['daily_return_std'] = returns.std()
         summary.loc['sharpe_ratio'] = (returns.mean() / returns.std()) * np.sqrt(252)
-        summary.loc['sortino_ratio'] = (returns.mean() / returns[returns < 0].std()) * np.sqrt(252)
 
         output_path = os.path.join(output_dir, f'{ticker}_summary_statistics.csv')
         summary.to_csv(output_path)
@@ -177,7 +174,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description="Visualize stock data")
     parser.add_argument("--tickers", nargs='+', required=True, help="List of stock tickers to visualize")
     parser.add_argument("--input_dir", default=os.path.join(os.path.dirname(__file__), '..', 'data'), help="Directory where the stock CSV files are located")
-    parser.add_argument("--output_dir", default=os.path.join(os.path.dirname(__file__), '..', 'visualizations'), help="Directory to save the visualizations")
+    parser.add_argument("--output_dir", default=os.path.join(os.path.dirname(__file__), '..', 'output'), help="Directory to save the visualizations")
     return parser.parse_args()
 
 if __name__ == "__main__":
@@ -187,20 +184,15 @@ if __name__ == "__main__":
 
     logger.info(f"Visualizing stock data for tickers: {args.tickers}")
     
-    with ProcessPoolExecutor() as executor:
-        futures = []
-        for ticker in args.tickers:
-            file_path = os.path.join(args.input_dir, f'{ticker}_stock_data.csv')
-            if os.path.exists(file_path):
-                futures.append(executor.submit(visualize_stock_data, ticker, file_path, args.output_dir))
-            else:
-                logger.warning(f"Stock data file for {ticker} not found at {file_path}")
-
-        dfs = []
-        for future in as_completed(futures):
-            df = future.result()
+    dfs = []
+    for ticker in args.tickers:
+        file_path = os.path.join(args.input_dir, f'{ticker}_stock_data.csv')
+        if os.path.exists(file_path):
+            df = visualize_stock_data(ticker, file_path, args.output_dir)
             if df is not None:
                 dfs.append(df)
+        else:
+            logger.warning(f"Stock data file for {ticker} not found at {file_path}")
 
     if len(dfs) > 1:
         plot_correlation_heatmap(dfs, args.tickers, args.output_dir)

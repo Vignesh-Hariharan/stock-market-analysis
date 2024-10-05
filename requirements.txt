@@ -1,25 +1,26 @@
-
 # Web Scraping
 selenium==4.12.0
 beautifulsoup4==4.12.2
 requests==2.31.0
+yfinance==0.2.31
 
 # Data Manipulation and Analysis
 pandas==2.1.0
 numpy==1.25.2
+sqlalchemy==2.0.20
 
 # Machine Learning
 scikit-learn==1.3.0
 tensorflow==2.13.0
+keras-tuner==1.3.5
 
 # Data Visualization
 matplotlib==3.7.2
 plotly==5.16.1
+seaborn==0.12.2
 
 # Database and ORM
-sqlalchemy==2.0.20
-snowflake-sqlalchemy==1.5.0
-redshift-connector==2.0.915
+sqlite==3.41.2  # Optional if you want sqlite3 commands or use sqlite3 in code
 
 # Jupyter (optional, for development and data exploration)
 jupyter==1.0.0
