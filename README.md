@@ -113,12 +113,12 @@ StockSense generates a variety of outputs to provide comprehensive insights:
 ### 1. Candlestick Charts
 Interactive HTML charts for AAPL, MSFT, and GOOGL stocks.
 
-![Sample Candlestick Chart](https://github.com/Vignesh-Hariharan/stock-market-analysis/raw/main/stock-market-analysis/output/sample_candlestick.png)
+![Sample Candlestick Chart](https://github.com/Vignesh-Hariharan/stock-market-analysis/output/sample_candlestick.png)
 
 ### 2. Advanced Technical Indicator Plots
 HTML-based interactive charts with various technical indicators.
 
-![Sample Technical Indicators](https://github.com/Vignesh-Hariharan/stock-market-analysis/raw/main/stock-market-analysis/output/sample_technical_indicators.png)
+![Sample Technical Indicators](https://github.com/Vignesh-Hariharan/stock-market-analysis/output/sample_technical_indicators.png)
 
 ### 3. Summary Statistics
 CSV files containing key statistical measures for each stock.
@@ -126,12 +126,12 @@ CSV files containing key statistical measures for each stock.
 ### 4. Seasonal Decomposition
 PNG images showing trend, seasonal, and residual components of each stock's time series.
 
-![Sample Seasonal Decomposition](https://github.com/Vignesh-Hariharan/stock-market-analysis/raw/main/stock-market-analysis/output/sample_seasonal_decomposition.png)
+![Sample Seasonal Decomposition](https://github.com/Vignesh-Hariharan/stock-market-analysis/output/sample_seasonal_decomposition.png)
 
 ### 5. Correlation Heatmap
 A PNG image visualizing the correlation between different stocks.
 
-![Correlation Heatmap](https://github.com/Vignesh-Hariharan/stock-market-analysis/raw/main/stock-market-analysis/output/correlation_heatmap.png)
+![Correlation Heatmap](https://github.com/Vignesh-Hariharan/stock-market-analysis/output/correlation_heatmap.png)
 
 All these outputs can be found in the `output/` directory of the project.
 
