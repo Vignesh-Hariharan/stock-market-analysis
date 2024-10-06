@@ -2,7 +2,7 @@
 
 ## 🌟 Project Overview
 
-StockSense is a cutting-edge platform that leverages real-time data and artificial intelligence to provide unparalleled insights into stock market trends and predictions. By combining advanced web scraping techniques, robust ETL processes, cloud-based data warehousing, state-of-the-art machine learning models, and interactive data visualizations, StockSense empowers investors to make informed decisions with confidence.
+StockSense is a project that leverages real-time data and ML to provide unparalleled insights into stock market trends and predictions. By combining advanced web scraping techniques, robust ETL processes, cloud-based data warehousing, state-of-the-art machine learning models, and interactive data visualizations, StockSense empowers investors to make informed decisions with confidence.
 
 ### 🔑 Key Features
 
