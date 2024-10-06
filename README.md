@@ -75,24 +75,24 @@ stock_market_analysis/
 
 4. Run the scraper to fetch stock data:
    ```
-  python src/scraper.py --tickers AAPL MSFT GOOGL --start_date YYYY-MM-DD --end_date YYYY-MM-DD --output_dir data/
+    python src/scraper.py --tickers AAPL MSFT GOOGL --start_date YYYY-MM-DD --end_date YYYY-MM-DD --output_dir data/
 
    ```
 
 5. Run the ETL pipeline:
    ```
-  python src/etl_pipeline.py
+    python src/etl_pipeline.py
 
    ```
 
 6. Train the machine learning model:
    ```
-  python src/model.py --db_path data/stock_data.db --ticker AAPL --epochs 50 --batch_size 32
+    python src/model.py --db_path data/stock_data.db --ticker AAPL --epochs 50 --batch_size 32
    ```
 
 7. Generate visualizations:
    ```
-  python src/visualization.py --tickers AAPL MSFT GOOGL --input_dir data/ --output_dir output/
+    python src/visualization.py --tickers AAPL MSFT GOOGL --input_dir data/ --output_dir output/
    ```
 
 ## 📊 Data Flow
