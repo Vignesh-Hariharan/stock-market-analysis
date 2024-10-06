@@ -52,7 +52,7 @@ stock_market_analysis/
 ├── requirements.txt         # Python dependencies
 └── .gitignore
 
-
+ ```
 
 ## 🚀 Setup Instructions
 
